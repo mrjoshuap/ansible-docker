@@ -1,0 +1,12 @@
+---
+- name: setup fedora
+  hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+  gather_facts: false
+
+  tasks:
+    - name: install packages for ansible support
+      raw: /usr/bin/dnf -y -e0 -d0 install python2 python2-dnf libselinux-python
+      tags: setup-fedora

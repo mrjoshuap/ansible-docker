@@ -1,0 +1,21 @@
+---
+- name: pull docker images
+  hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: pull docker images
+      docker_image:
+        name: "{{ item }}"
+      with_items:
+        - "registry:2"
+        - "mariadb"
+        - "wordpress"
+        - "fedora"
+        - "centos:6"
+        - "centos:7"
+        - "rhel6"
+        - "rhel7"
+      tags: pull-docker-images

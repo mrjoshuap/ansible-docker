@@ -1,0 +1,11 @@
+---
+- name: cleanup
+  hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: remove persistent volume storage
+      file: path=/data state=absent
+      tags: cleanup

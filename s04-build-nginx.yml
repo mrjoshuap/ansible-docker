@@ -1,0 +1,27 @@
+---
+- name: build nginx container
+  hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: create a local temp directory
+      command: mktemp -d /tmp/ansible.XXXXXXX
+      register: nginx_docker_build_path
+      tags: build-nginx
+
+    - name: synchronize nginx docker build directory
+      synchronize: src=nginx/ dest="{{ nginx_docker_build_path.stdout }}/" recursive=yes
+      tags: build-nginx
+
+    - name: build the nginx image
+      docker_image:
+        path: "{{ nginx_docker_build_path.stdout }}"
+        name: nginx
+        force: yes
+      tags: build-nginx
+
+    - name: remove the docker build directory
+      file: path="{{ nginx_docker_build_path.stdout }}" state=absent
+      tags: build-nginx

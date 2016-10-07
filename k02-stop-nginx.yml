@@ -1,0 +1,13 @@
+---
+- name: stop nginx
+  hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: Stop and remove the nginx container
+      docker_container:
+        name: nginx
+        state: absent
+      tags: stop-nginx

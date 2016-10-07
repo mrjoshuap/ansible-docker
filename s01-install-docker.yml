@@ -1,0 +1,19 @@
+---
+- name: install docker
+  hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: install the docker daemon
+      package: name=docker state=installed
+      tags: install-docker
+
+    - name: install the docker-py library
+      package: name=python-docker-py state=installed
+      tags: install-docker
+
+    - name: enable and start the docker daemon
+      service: name=docker state=running enabled=yes
+      tags: install-docker

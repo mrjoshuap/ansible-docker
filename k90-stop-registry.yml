@@ -1,0 +1,13 @@
+---
+- name: stop registry
+  hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: Remove the registry container
+      docker_container:
+        name: registry
+        state: absent
+      tags: stop-registry

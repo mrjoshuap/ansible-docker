@@ -1,0 +1,41 @@
+---
+- name: start registry
+  hosts: all
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  tasks:
+    - name: create persistent volume storage for registry
+      file: path=/data/registry recurse=yes state=directory mode=0755 setype=svirt_sandbox_file_t
+      tags: start-registry
+
+    - name: copy registry configuration to persistent data
+      copy: src=files/config.yml dest=/data/registry/config.yml owner=root group=root mode=0644
+      tags: start-registry
+
+    - name: set selinux context type of registry configuration file
+      file: path=/data/registry/config.yml setype=svirt_sandbox_file_t
+      tags: start-registry
+
+    - name: Launch the registry container
+      docker_container:
+        name: registry
+        image: docker.io/registry:2
+        restart_policy: always
+        ports:
+          - 5000:5000
+        volumes:
+          - /data/registry:/var/lib/registry
+        command: /var/lib/registry/config.yml
+      tags: start-registry
+
+    - name: configure docker daemon to use insecure registry mirror
+      lineinfile: dest=/etc/sysconfig/docker state=present regexp='^INSECURE_REGISTRY' line='INSECURE_REGISTRY="--registry-mirror=http://localhost:5000 --insecure-registry localhost:5000"'
+      notify: restart docker daemon
+      tags: start-registry
+
+  handlers:
+    - name: restart docker daemon
+      service: name=docker state=restarted
+      tags: restart-registry
