@@ -11,3 +11,9 @@
         name: nginx
         state: absent
       tags: stop-nginx
+
+    - name: Remove the nginx image
+      docker_image:
+        name: nginx
+        state: absent
+      tags: stop-nginx
